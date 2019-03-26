@@ -1,0 +1,96 @@
+* A simple quickref for nimeigen
+** Tips
+*** difference with c++ eigen
+    1. nimeigen doesn't support resize ~A.resize(1,2)~
+    2. nimeigen doesn't support set-create ~A.setIdentity(2,3)~
+
+*** difference with numpy
+    1. nimeigen dosen't support ndarray. It's only a matrix library for now.
+    2. math operators are similar to matlab rather than numpy. 
+
+** Functions
+*** create empty matrix
+    #+BEGIN_SRC nim
+      var a = newMatrix(200,200) # complex64 by default
+      var b = newMatrix(200,200,float64)
+    #+END_SRC
+
+*** Basic usage
+    | nimeigen   | Eigen      | Matlab       | comments          |
+    |------------+------------+--------------+-------------------|
+    | ~x.size()~ | ~x.size()~ | ~length(x)~  | vector size       |
+    | ~x.rows()~ | ~C.rows()~ | ~size(C,1)~  | number of rows    |
+    | ~x.cols()~ | ~C.cols()~ | ~size(C,2)~  | number of columns |
+    | ~x[i]~     | ~x(i)~     | ~x(i+1)~     | Matlab is 1-based |
+    | ~x[i,j]~   | ~C(i,j)~   | ~C(i+1,j+1)~ |                   |
+
+*** Creating Arrays
+    | nimeigen                       | numpy                         | comments                                             |
+    |--------------------------------+-------------------------------+------------------------------------------------------|
+    | ~A.fill(10.float32)~           |                               |                                                      |
+    | ~newMatrix([[1,2,3],[4,5,6]])~ | ~np.array([(1,2,3),(4,5,6)])~ | Two dimensional matrix                               |
+    | ~zeros(3,3)~                   | ~np.zeros((3,3))~             | 3x3 matrix all values 0                              |
+    | ~ones(3,4)~                    | ~np.ones((3,4))~              | 3x4 matrix with all values 1                         |
+    | ~eye(5)~                       | ~np.eye(5)~                   | 5x5 matrix of 0 with 1 on diagonal (Identity matrix) |
+    | ~linspace(0,100,6)~            | ~np.linspace(0,100,6)~        | Matrix of 6 evenly divided values from 0 to 100      |
+    | ~full(2,3,8)~                  | ~np.full((2,3),8)~            | 2x3 matrix with all values 8                         |
+    | ~rand(4,5)~                    | ~np.random.rand(4,5)~         | 4x5 matrix of random floats between 0–1              |
+                                                                                                                                  
+*** Inspecting Properties
+    | nimeigen           | numpy               | comments                                 |
+    |--------------------+---------------------+------------------------------------------|
+    | ~mat.size~         | ~mat.size~          | Returns number of elements in mat        |
+    | ~mat.shape~        | ~mat.shape~         | Returns dimensions of mat (rows,columns) |
+    | ~type(mat[0,0])~   | ~mat.dtype~         | Returns type of elements in mat          |
+    |                    | ~mat.astype(dtype)~ | Convert mat elements to type dtype       |
+    | ~mat.toSeq(dtype)~ | ~mat.tolist()~      | Convert mat to a list(python)/seq(nim)   |
+                                                                         
+*** Operator
+    | nimeigen      | numpy                       | comments                                                             |
+    |---------------+-----------------------------+----------------------------------------------------------------------|
+    | *scalar*      |                             |                                                                      |
+    | ~mat .+ 1~    | ~np.add(mat,1)~             | Add 1 to each array element                                          |
+    | ~mat .- 2~    | ~np.subtract(mat,2)~        | Subtract 2 from each array element                                   |
+    | ~mat .* 3~    | ~np.multiply(mat,3)~        | Multiply each array element by 3                                     |
+    | ~mat ./ 4~    | ~np.divide(mat,4)~          | Divide each array element by 4 (returns np.nan for division by zero) |
+    | ~mat .^ 5~    | ~np.power(mat,5)~           | Raise each array element to the 5th power                            |
+    |---------------+-----------------------------+----------------------------------------------------------------------|
+    | *vector*      |                             |                                                                      |
+    | ~mat1 + mat2~ | ~np.add(mat1,mat2)~         | Elementwise add mat2 to mat1                                         |
+    | ~mat1 - mat2~ | ~np.subtract(mat1,mat2)~    | Elementwise subtract mat2 from mat1                                  |
+    | ~mat1 * mat2~ | ~np.multiply(mat1,mat2)~    | Elementwise multiply mat1 by mat2                                    |
+    | ~mat1 / mat2~ | ~np.divide(mat1,mat2)~      | Elementwise divide mat1 by mat2                                      |
+    |               | ~np.power(mat1,mat2)~       | Elementwise raise mat1 raised to the power of mat2                   |
+
+*** Math
+    | nimeigen                                    | numpy                         | comments                                                               |
+    |---------------------------------------------+-------------------------------+------------------------------------------------------------------------|
+    | ~mat.transpose()~, ~mat.trans()~, ~mat.T()~ | ~mat.transpose()~             |                                                                        |
+    | ~mat.conjugate()~, ~mat.conj()~             | ~mat.conjugate()~             |                                                                        |
+    | ~mat.adjoint()~, ~mat.H()~                  | ~mat.transpose().conjugate()~ |                                                                        |
+    | ~abs(mat)~                                  | ~np.abs(mat)~                 | Absolute value of each element in the matrix                           |
+    | ~sqrt(mat)~                                 | ~np.sqrt(mat)~                | Square root of each element in the matrix                              |
+    | ~sin(mat)~                                  | ~np.sin(mat)~                 | Sine of each element in the matrix                                     |
+    | ~cos(mat)~                                  | ~np.cos(mat)~                 |                                                                        |
+    | ~log(mat)~                                  | ~np.log(mat)~                 | Natural log of each element in the matrix                              |
+    | ~exp(mat)~                                  | ~np.exp(mat)~                 |                                                                        |
+    | ~mean(mat)~                                 | ~np.mean(mat)~                | Returns mean along specific axis                                       |
+    | ~sum(mat)~                                  | ~mat.sum()~                   | Returns sum of mat                                                     |
+    | ~prod(mat)~                                 | ~np.prod(mat)~                |                                                                        |
+    | ~min(mat)~                                  | ~mat.min()~                   | Returns minimum value of mat                                           |
+    | ~max(mat)~                                  | ~mat.max()~                   | Returns maximum value of specific axis                                 |
+    | ~trace(mat)~                                | ~mat.trace()~                 |                                                                        |
+    | ~diagonal(mat)~, ~diag(mat)~                | ~mat.diag()~                  |                                                                        |
+    | ~norm(mat)~                                 | ~np.linalg.norm(mat)~         | for vectors, the l2 norm of *this, and for matrices the Frobenius norm |
+    | ~real(mat)~                                 | ~mat.real()~                  |                                                                        |
+    | ~imag(mat)~                                 | ~mat.imag()~                  |                                                                       |
+
+*** Linalg
+    | nimeigen            | numpy                    | comments |
+    |---------------------+--------------------------+----------|
+    | ~eigenvalues(mat)~  | ~np.linalg.eigvals(mat)~ |          |
+*** Logic
+    | nimeigen              | numpy                    | comments                      |
+    |-----------------------+--------------------------+-------------------------------|
+    | ~allclose(mat1,mat2)~ | ~np.allclose(mat1,mat2)~ | ~mat1==mat2~ for float number |
+    | ~isclose(mat1,mat2)~  | ~np.isclose(mat1,mat2)~  |                               |
