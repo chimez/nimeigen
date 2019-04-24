@@ -1,4 +1,4 @@
-import complex except Complex32, Complex64
+import complex
 import unittest
 import nimeigen/stdcomplex
 

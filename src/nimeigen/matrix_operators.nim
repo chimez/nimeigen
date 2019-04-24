@@ -1,6 +1,51 @@
 # this file contains all operators + - * / .+ .- .* ./ .^
-import complex except Complex32, Complex64
+import complex
 import ./matrix
+
+template do_for_all_ms(matrix_type,scalar_type:typedesc)=
+  proc `+`*(x:matrix_type, y:scalar_type):matrix_type=
+    result = x
+    for i in 0..<x.rows():
+      for j in 0..<x.cols():
+        result[i,j] = x[i,j] + y
+  proc `+`*(x:scalar_type, y:matrix_type):matrix_type=
+    result = y
+    for i in 0..<y.rows():
+      for j in 0..<y.cols():
+        result[i,j] = y[i,j] + x
+
+  proc `-`*(x:matrix_type, y:scalar_type):matrix_type=
+    result = x
+    for i in 0..<x.rows():
+      for j in 0..<x.cols():
+        result[i,j] = x[i,j] - y
+  proc `-`*(x:scalar_type, y:matrix_type):matrix_type=
+    result = y
+    for i in 0..<y.rows():
+      for j in 0..<y.cols():
+        result[i,j] = x - y[i,j]
+
+do_for_all_ms(MatrixXcd, Complex[float64])
+do_for_all_ms(MatrixXcf, Complex[float32])
+do_for_all_ms(MatrixXd, float64)
+do_for_all_ms(MatrixXf, float32)
+
+proc `.*`*[T:MatrixType](x,y:T):T=
+  if (x.rows()!=y.rows()) or (x.cols()!=y.cols()):
+    raise newException(ValueError, "matrix are not same")
+  result = x
+  for i in 0..<x.rows():
+    for j in 0..<x.cols():
+      result[i,j] = x[i,j] * y[i,j]
+
+proc `./`*[T:MatrixType](x,y:T):T=
+  if (x.rows()!=y.rows()) or (x.cols()!=y.cols()):
+    raise newException(ValueError, "matrix are not same")
+  result = x
+  for i in 0..<x.rows():
+    for j in 0..<x.cols():
+      result[i,j] = x[i,j] / y[i,j]
+
 
 proc `+`*(x,y: MatrixXd):MatrixXd {.importcpp:"# + #", header:"<Eigen/Core>".}
 proc `+`*(x,y: MatrixXf):MatrixXf {.importcpp:"# + #", header:"<Eigen/Core>".}

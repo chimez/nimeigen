@@ -9,20 +9,22 @@
     2. math operators are similar to matlab rather than numpy. 
 
 ** Functions
-*** create empty matrix
+*** Create empty matrix
     #+BEGIN_SRC nim
       var a = newMatrix(200,200) # complex64 by default
       var b = newMatrix(200,200,float64)
     #+END_SRC
 
 *** Basic usage
-    | nimeigen   | Eigen      | Matlab       | comments          |
-    |------------+------------+--------------+-------------------|
-    | ~x.size()~ | ~x.size()~ | ~length(x)~  | vector size       |
-    | ~x.rows()~ | ~C.rows()~ | ~size(C,1)~  | number of rows    |
-    | ~x.cols()~ | ~C.cols()~ | ~size(C,2)~  | number of columns |
-    | ~x[i]~     | ~x(i)~     | ~x(i+1)~     | Matlab is 1-based |
-    | ~x[i,j]~   | ~C(i,j)~   | ~C(i+1,j+1)~ |                   |
+    | nimeigen       | Eigen      | Matlab       | comments          |
+    |----------------+------------+--------------+-------------------|
+    | ~x.size()~     | ~x.size()~ | ~length(x)~  | vector size       |
+    | ~x.rows()~     | ~C.rows()~ | ~size(C,1)~  | number of rows    |
+    | ~x.cols()~     | ~C.cols()~ | ~size(C,2)~  | number of columns |
+    | ~x[i]~         | ~x(i)~     | ~x(i+1)~     | Matlab is 1-based |
+    | ~x[i,j]~       | ~C(i,j)~   | ~C(i+1,j+1)~ |                   |
+    | ~x[1..2]=v~    |            | ~x[1:2]=v~   | ~:~ is ~..~       |
+    | ~x[1..2,3..4]~ |            | ~x[1:2,3:4]~ |                   |
 
 *** Creating Arrays
     | nimeigen                       | numpy                         | comments                                             |
@@ -94,3 +96,16 @@
     |-----------------------+--------------------------+-------------------------------|
     | ~allclose(mat1,mat2)~ | ~np.allclose(mat1,mat2)~ | ~mat1==mat2~ for float number |
     | ~isclose(mat1,mat2)~  | ~np.isclose(mat1,mat2)~  |                               |
+*** Sparse Matrix
+    have to ~include nimeigen/eigentype~
+    | nimeigen               | numpy                          | comments                |
+    |------------------------+--------------------------------+-------------------------|
+    | ~csr_matrix(mat)~      | ~scipy.sparse.csr_matrix(mat)~ | ~mat~ is a dense matrix |
+    | ~csc_matrix(mat)~      | ~scipy.sparse.csc_matrix(mat)~ | ~mat~ is a dense matrix |
+    | ~spmr * spmr1~         | ~spmr * spmr1~                 | ~+,-,*,/~ is supported  |
+    | ~dm2 = sm * dm1~       | ~dm2 = sm * dm1~               | specially               |
+    | ~issparse(spmr)~       | ~issparse(spmr)~               |                         |
+    | ~isspmatrix(spmr)~     | ~isspmatrix(spmr)~             |                         |
+    | ~isspmatrix_csr(spmr)~ | ~isspmatrix_csr(spmr)~         |                         |
+    | ~isspmatrix_csc(spmr)~ | ~isspmatrix_csc(spmr)~         |                         |
+    | ~mat.get_shape()~      | ~mat.get_shape()~              | ~(rows,cols)~           |

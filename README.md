@@ -190,12 +190,29 @@ numpy: [0.41937476-1.44187427j 4.58062524+1.44187427j]
 pyeigs: [[0.41937476-1.44187427j 4.58062524+1.44187427j]]
 ```
 
+## As a scientific computing library
+### ODE solver (Explicit Runge-Kutta method of order 5(4))
+This is an example from [scipy's solve_ivp](https://docs.scipy.org/doc/scipy/reference/generated/scipy.integrate.solve_ivp.html#scipy.integrate.solve_ivp ) 
+
+```nim 
+import complex except Complex32, Complex64
+import nimeigen
+import nimeigen/sci/ode/solve_ivp
+
+let y0 = matrix([[2,4,8]])
+func exponential_decay(t:float64, y:MatrixXcd):MatrixXcd= -0.5*y
+let (t,y) = solve_ivp(exponential_decay, (0.0,10.0), y0)
+
+echo t 
+echo y[len(y)-1]
+```
+
+
 ## Tips
 1. all available functions are listed in `quick_reference.org`
 2. `tests/test_matrix.nim` is a good example.
 ## TODO
-1. sparse matrix
-2. tensor or ndarray
+1. tensor or ndarray
 ## Contributing
 1. feel free to open an issue for any feature requests, not only wrap Eigen functions but also any numpy/scipy useful functions.
 2. Any PR are Welcome.

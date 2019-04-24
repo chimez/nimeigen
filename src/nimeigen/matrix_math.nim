@@ -4,7 +4,7 @@
 # 3. trace
 # 4. abs, sin, cos, sqrt, exp, log
 # 5. norm, diag, eigenvalues
-import complex except Complex32, Complex64
+import complex
 import ./matrix, ./matrix_operators
 
 proc transpose*[T:MatrixType](m:T):T {.importcpp:"#.transpose()", header:"<Eigen/Core>".}

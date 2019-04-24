@@ -1,7 +1,6 @@
-import complex except Complex32, Complex64
+import complex
 import unittest
 import nimeigen
-
 
 suite "test matrix":
   test "new empty matrix & getter & setter":
@@ -12,15 +11,9 @@ suite "test matrix":
 
     a[1,1] = cc
     b[1,2] = 3
-    a[399] = cc
-    b[8] = 4
 
     check: a[1,1] == cc
     check: b[1,2] == 3
-    check: a[201] == cc
-    check: b[401] == 3
-    check: a[399] == cc
-    check: b[8] == 4
 
     block:
       let m = matrix([[1,2,3],[4,5,6]], float32)
@@ -107,11 +100,33 @@ suite "test matrix":
       let mf = full(200,300,20.Complex64)
       check: m == mf
 
+    block:
+      let m1 = matrix([[1,2,3],[4,5,6]])
+      let m2 = matrix([[2,3,4],[5,6,7]])
+      check: allclose(m1+1, m2)
+      check: allclose(1+m1, m2)
+      check: allclose(m1, m2-1)
+      check: allclose(m1*(-1), 1-m2)
+
   test "matrix * matrix":
     let m1 = matrix([[2,3,4],[5,6,7]]) * 0.1.Complex64
     let m2 = 10.Complex64 * m1 * m1.transpose().conj()
     let m3 = matrix([[29,56],[56,110]])
     check: m2 == m3
+
+    block:
+      let m1 = matrix([[1,2,3],[4,5,6]])
+      let m2 = matrix([[1,1,1],[1,1,1]])
+      check: allclose(m1 ./ m1, m2)
+      check: allclose(m2 .* m2, m2)
+
+  test "astype":
+    let m1 = matrix([[1,2,3]],dtype=Complex[float64])
+    let m2 = matrix([[1,2,3]],dtype=Complex[float32])
+    let m3 = matrix([[1,2,3]],dtype=float64)
+    let m4 = matrix([[1,2,3]],dtype=float32)
+
+    check: allclose(m1+m3, m1+m1)
 
   test "Basic arithmetic reduction operations":
     let m = matrix([[1,2],[3,4]])
@@ -154,6 +169,13 @@ suite "test matrix":
     check: allclose(m1, m1)
     check: flag
 
+    block:
+      let m1 = matrix([[1,2,3,4]], dtype=float64)
+      let m2 = matrix([[0,2,5,3]], dtype=float64)
+      let m3 = matrix([[1,2,5,4]], dtype=float64)
+      check: allclose(maximum(m1,m2),m3)
+
+
 
   test "math functions":
     let m1 = matrix([[1,2],[3,4]],float64)
@@ -189,8 +211,89 @@ suite "test matrix":
       check: allclose(m1 .^ 10, m)
 
   test "linalg":
-    let m1 = matrix([[1,2],[3,4]],float64)
-    let m2 = matrix([[1,2],[3,4]])
-    let m_vals = matrix([[-0.3722813232690144],[5.372281323269015]])
-    check: allclose(m_vals,m1.eigenvalues())
-    check: allclose(m_vals,m2.eigenvalues())
+    block:
+      let m1 = matrix([[1,2],[3,4]],float64)
+      let m2 = matrix([[1,2],[3,4]])
+      let m_vals = matrix([[-0.3722813232690144],[5.372281323269015]])
+      check: allclose(m_vals,m1.eigenvalues())
+      check: allclose(m_vals,m2.eigenvalues())
+
+    block:
+      let m = matrix([[ 0,  1,  2,  3],
+                      [ 4,  5,  6,  7],
+                      [ 8,  9, 10, 11],
+                      [12, 13, 14, 15]])
+      check: m.norm()-35.213633723<1e-5
+
+  test "accessors":
+    block:
+      let m = matrix([[ 0,  1,  2,  3],
+                      [ 4,  5,  6,  7],
+                      [ 8,  9, 10, 11],
+                      [12, 13, 14, 15]])
+      let mf = matrix([[ 0,  1,  2,  3],
+                       [ 4,  5,  6,  7],
+                       [ 8,  9, 10, 11],
+                       [12, 13, 14, 15]], dtype=float64)
+      let m1 = matrix([[ 4,  5,  6,  7],
+                       [ 8,  9, 10, 11]])
+      let mf1 = matrix([[ 4,  5,  6,  7],
+                       [ 8,  9, 10, 11],
+                       [12, 13, 14, 15]], dtype=float64)
+      let v1 = matrix([[ 4,  5,  6,  7]])
+
+      check: allclose(m[1..3],m1)
+      check: allclose(m[_.._],m)
+      check: allclose(mf[1.._],mf1)
+      check: allclose(m[1],v1)
+      check: allclose(m[1..(-1)],m1)
+
+    block:
+      let m0 = matrix([[ 0,  1,  2,  3],
+                       [ 4,  5,  6,  7],
+                       [ 8,  9, 10, 11],
+                       [12, 13, 14, 15]])
+      var m = matrix([[ 0,  1,  2,  3],
+                      [ 4,  5,  6,  7],
+                      [ 8,  9, 10, 11],
+                      [12, 13, 14, 15]])
+      let mv = matrix([[ 0,  1,  2,  3],
+                       [ 4,  5,  6,  7],
+                       [ 1,  2,  3,  4],
+                       [12, 13, 14, 15]])
+      let mi = matrix([[1, 2, 3, 4]])
+      let mo = matrix([[8, 9, 10, 11]])
+
+      m[2..3] = mi
+      check: allclose(m,mv)
+      m[-2] = mo
+      check: allclose(m,m0)
+
+    block:
+      let m = matrix([[ 0,  1,  2,  3],
+                      [ 4,  5,  6,  7],
+                      [ 8,  9, 10, 11],
+                      [12, 13, 14, 15]])
+      let m1 = matrix([[ 5,  6],
+                       [ 9, 10]])
+      check: allclose(m[1..3, 1..3],m1)
+
+    block:
+      var m = matrix([[ 0,  1,  2,  3],
+                      [ 4,  5,  6,  7],
+                      [ 8,  9, 10, 11],
+                      [12, 13, 14, 15]])
+      let mv = matrix([[ 0,  1,  2,  3],
+                       [ 4,  1,  3,  7],
+                       [ 8,  2,  4, 11],
+                       [12, 13, 14, 15]])
+      let m1 = matrix([[ 1,  3],
+                       [ 2,  4]])
+      m[1..3,1..3]=m1
+      check: allclose(m,mv)
+
+  # test "memory":
+  #   for i in 0..1000:
+  #     let m = rand(10000,10000)
+  #     let mm = m * m 
+
